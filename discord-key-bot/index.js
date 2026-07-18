@@ -2,8 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const cookieSession = require('cookie-session');
-const fetchImport = require('node-fetch');
-const fetch = fetchImport.default || fetchImport;
 const { Client, GatewayIntentBits, PermissionsBitField } = require('discord.js');
 require('dotenv').config();
 
