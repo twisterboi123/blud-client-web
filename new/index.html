@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blud Client — Roblox Script Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #08080a;
+    --surface: #101013;
+    --surface-2: #16161a;
+    --border: #232328;
+    --border-hover: #2b5fd9;
+    --text: #e9e9ec;
+    --muted: #8a8a93;
+    --muted-2: #57575f;
+    --blue: #2b6bff;
+    --blue-bright: #5b93ff;
+    --blue-dim: rgba(43,107,255,0.12);
+    --blue-glow: rgba(60,120,255,0.35);
+    --green: #37d67a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{
+    font-family:'Chakra Petch', sans-serif;
+    letter-spacing:0.01em;
+  }
+  code, .mono{ font-family:'JetBrains Mono', monospace; }
+  a{ color:inherit; text-decoration:none; }
+  ::selection{ background:var(--blue); color:#fff; }
+
+  .bg-grid{
+    position:fixed; inset:0; z-index:-1;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+  }
+  .glow-orb{
+    position:fixed; top:-200px; left:50%; transform:translateX(-50%);
+    width:900px; height:500px; z-index:-1;
+    background: radial-gradient(closest-side, rgba(43,107,255,0.18), transparent);
+    pointer-events:none;
+  }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 28px; }
+
+  /* NAV */
+  nav{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter: blur(10px);
+    background:rgba(8,8,10,0.75);
+    border-bottom:1px solid var(--border);
+  }
+  nav .wrap{ display:flex; align-items:center; justify-content:space-between; height:72px; }
+  .logo{ display:flex; align-items:center; gap:10px; font-family:'Chakra Petch'; font-weight:700; font-size:19px; }
+  .logo-mark{
+    width:30px; height:30px; border-radius:8px;
+    background:linear-gradient(135deg, var(--blue), #0d2f8f);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:700; color:#fff;
+    box-shadow:0 0 0 1px rgba(255,255,255,0.08) inset;
+  }
+  .nav-links{ display:flex; gap:36px; }
+  .nav-links a{
+    color:var(--muted); font-size:14.5px; font-weight:500;
+    position:relative; padding:4px 0; transition:color .18s ease;
+  }
+  .nav-links a::after{
+    content:''; position:absolute; left:0; bottom:-4px; width:0; height:2px;
+    background:var(--blue-bright); transition:width .2s ease;
+  }
+  .nav-links a:hover{ color:var(--text); }
+  .nav-links a:hover::after{ width:100%; }
+  .nav-right{ display:flex; align-items:center; gap:18px; }
+
+  /* BUTTONS */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    font-family:'Inter'; font-weight:600; font-size:14.5px;
+    padding:11px 22px; border-radius:9px; cursor:pointer;
+    border:1px solid var(--border); background:var(--surface);
+    color:var(--text);
+    transition: background .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease, transform .12s ease;
+  }
+  .btn:hover{
+    background:var(--blue);
+    border-color:var(--blue-bright);
+    color:#fff;
+    box-shadow:0 0 0 4px var(--blue-dim), 0 8px 24px -8px var(--blue-glow);
+    transform:translateY(-1px);
+  }
+  .btn:active{ transform:translateY(0); }
+  .btn-solid{
+    background:var(--blue); border-color:var(--blue);
+    color:#fff;
+    box-shadow:0 8px 24px -10px var(--blue-glow);
+  }
+  .btn-solid:hover{ background:var(--blue-bright); border-color:var(--blue-bright); }
+  .btn-ghost{ background:transparent; }
+  .btn-sm{ padding:8px 16px; font-size:13.5px; border-radius:7px; }
+  .btn-block{ width:100%; }
+
+  /* HERO */
+  header.hero{ padding:96px 0 60px; position:relative; }
+  .hero-grid{
+    display:grid; grid-template-columns: 1.05fr 0.95fr; gap:56px; align-items:center;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono'; font-size:12px; color:var(--blue-bright);
+    background:var(--blue-dim); border:1px solid rgba(43,107,255,0.35);
+    padding:6px 12px; border-radius:99px; margin-bottom:22px;
+  }
+  .eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); }
+  .hero h1{
+    font-size:52px; font-weight:700; line-height:1.05; letter-spacing:-0.01em;
+    margin-bottom:20px;
+  }
+  .hero h1 span{ color:var(--blue-bright); }
+  .hero p.lead{ color:var(--muted); font-size:16.5px; max-width:480px; margin-bottom:32px; }
+  .hero-actions{ display:flex; gap:14px; margin-bottom:34px; }
+  .hero-meta{ display:flex; gap:28px; color:var(--muted-2); font-size:13px; }
+  .hero-meta div{ display:flex; align-items:center; gap:7px; }
+  .hero-meta strong{ color:var(--text); font-weight:600; }
+
+  /* GUI MOCK — the signature element */
+  .gui-mock{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow: 0 30px 80px -30px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.02);
+    user-select:none;
+  }
+  .gui-titlebar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 16px; background:var(--surface-2); border-bottom:1px solid var(--border);
+  }
+  .gui-titlebar .t-left{ display:flex; align-items:center; gap:9px; }
+  .gui-titlebar .dots{ display:flex; gap:6px; }
+  .gui-titlebar .dots span{ width:9px; height:9px; border-radius:50%; background:#2a2a30; }
+  .gui-titlebar .title{ font-family:'Chakra Petch'; font-size:13px; font-weight:600; color:var(--muted); }
+  .gui-body{ display:flex; min-height:340px; }
+  .gui-tabs{
+    width:130px; border-right:1px solid var(--border); padding:14px 10px; display:flex; flex-direction:column; gap:4px;
+  }
+  .gui-tab{
+    font-size:13px; font-weight:500; color:var(--muted); padding:9px 12px; border-radius:7px;
+    cursor:pointer; transition:background .15s ease, color .15s ease;
+    display:flex; align-items:center; gap:8px;
+  }
+  .gui-tab .ic{ width:6px; height:6px; border-radius:2px; background:var(--muted-2); transition:background .15s ease; }
+  .gui-tab:hover{ background:rgba(43,107,255,0.1); color:var(--blue-bright); }
+  .gui-tab:hover .ic{ background:var(--blue-bright); }
+  .gui-tab.active{ background:var(--blue-dim); color:var(--blue-bright); }
+  .gui-tab.active .ic{ background:var(--blue-bright); }
+  .gui-panel{ flex:1; padding:18px 20px; }
+  .gui-panel h4{ font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted-2); margin-bottom:14px; font-weight:600; }
+  .gui-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:11px 0; border-bottom:1px solid var(--border);
+    font-size:13.5px;
+  }
+  .gui-row:last-child{ border-bottom:none; }
+  .toggle{
+    width:38px; height:21px; border-radius:99px; background:var(--surface-2);
+    border:1px solid var(--border); position:relative; cursor:pointer;
+    transition:background .18s ease, border-color .18s ease;
+  }
+  .toggle::after{
+    content:''; position:absolute; top:2px; left:2px; width:15px; height:15px; border-radius:50%;
+    background:var(--muted); transition: transform .18s ease, background .18s ease;
+  }
+  .toggle:hover{ border-color:var(--border-hover); }
+  .toggle.on{ background:var(--blue-dim); border-color:var(--blue); }
+  .toggle.on::after{ transform:translateX(17px); background:var(--blue-bright); box-shadow:0 0 8px var(--blue-glow); }
+  .gui-slider{ width:110px; height:5px; background:var(--surface-2); border-radius:99px; position:relative; cursor:pointer; }
+  .gui-slider .fill{ position:absolute; left:0; top:0; height:100%; border-radius:99px; background:var(--blue); }
+  .gui-slider .knob{ position:absolute; top:50%; width:12px; height:12px; border-radius:50%; background:var(--blue-bright); transform:translate(-50%,-50%); box-shadow:0 0 6px var(--blue-glow); }
+
+  /* SECTIONS */
+  section{ padding:88px 0; border-top:1px solid var(--border); }
+  .section-head{ max-width:560px; margin-bottom:48px; }
+  .section-label{ font-family:'JetBrains Mono'; font-size:12.5px; color:var(--blue-bright); margin-bottom:12px; display:block; }
+  .section-head h2{ font-size:34px; font-weight:700; margin-bottom:12px; letter-spacing:-0.01em; }
+  .section-head p{ color:var(--muted); font-size:15.5px; }
+
+  /* FEATURES */
+  .feature-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+  .feature{
+    background:var(--surface); padding:30px 26px; transition:background .2s ease;
+    position:relative;
+  }
+  .feature:hover{ background:var(--surface-2); }
+  .feature-icon{
+    width:38px; height:38px; border-radius:9px; background:var(--blue-dim); border:1px solid rgba(43,107,255,0.3);
+    display:flex; align-items:center; justify-content:center; margin-bottom:18px;
+    color:var(--blue-bright); font-size:16px; font-weight:700; font-family:'JetBrains Mono';
+    transition: box-shadow .2s ease;
+  }
+  .feature:hover .feature-icon{ box-shadow:0 0 0 4px var(--blue-dim); }
+  .feature h3{ font-size:16.5px; font-weight:600; margin-bottom:8px; }
+  .feature p{ color:var(--muted); font-size:13.8px; }
+
+  /* SCRIPT / GET */
+  .get-panel{
+    display:grid; grid-template-columns: 1fr 1fr; gap:0;
+    border:1px solid var(--border); border-radius:14px; overflow:hidden;
+  }
+  .get-copy{ padding:44px; background:var(--surface); }
+  .get-copy h2{ font-size:28px; margin-bottom:14px; }
+  .get-copy p{ color:var(--muted); font-size:15px; margin-bottom:26px; }
+  .get-steps{ display:flex; flex-direction:column; gap:14px; margin-bottom:30px; }
+  .get-step{ display:flex; gap:12px; align-items:flex-start; font-size:13.8px; color:var(--muted); }
+  .get-step b{ color:var(--text); }
+  .step-num{
+    width:22px; height:22px; border-radius:6px; background:var(--surface-2); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:11.5px; font-family:'JetBrains Mono'; color:var(--blue-bright);
+    flex-shrink:0;
+  }
+  .code-box{ background:#0c0c0e; display:flex; flex-direction:column; }
+  .code-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px; border-bottom:1px solid var(--border);
+  }
+  .code-head span{ font-family:'JetBrains Mono'; font-size:12px; color:var(--muted); }
+  .code-body{ padding:22px; font-family:'JetBrains Mono'; font-size:13px; color:#b8c4e8; flex:1; overflow-x:auto; }
+  .code-body .c1{ color:var(--blue-bright); }
+  .code-body .c2{ color:var(--green); }
+  .code-body .c3{ color:var(--muted-2); }
+  .copy-btn{
+    display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:500; color:var(--muted);
+    padding:6px 12px; border-radius:6px; border:1px solid var(--border); cursor:pointer;
+    transition:all .18s ease; background:transparent; font-family:'Inter';
+  }
+  .copy-btn:hover{ color:#fff; background:var(--blue); border-color:var(--blue-bright); }
+
+  /* CHANGELOG */
+  .changelog{ display:flex; flex-direction:column; gap:0; }
+  .log-entry{
+    display:grid; grid-template-columns:110px 1fr; gap:24px;
+    padding:22px 0; border-bottom:1px solid var(--border);
+  }
+  .log-entry:last-child{ border-bottom:none; }
+  .log-version{ font-family:'JetBrains Mono'; font-size:13px; color:var(--blue-bright); padding-top:2px; }
+  .log-content h4{ font-size:15px; font-weight:600; margin-bottom:6px; }
+  .log-content p{ color:var(--muted); font-size:13.8px; }
+  .log-tag{
+    display:inline-block; font-size:10.5px; font-family:'JetBrains Mono'; padding:2px 8px; border-radius:5px;
+    background:var(--blue-dim); color:var(--blue-bright); margin-left:10px; vertical-align:middle;
+  }
+
+  /* FOOTER */
+  footer{ padding:50px 0 40px; }
+  .footer-inner{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; }
+  .footer-links{ display:flex; gap:26px; }
+  .footer-links a{ color:var(--muted); font-size:13.5px; transition:color .18s ease; }
+  .footer-links a:hover{ color:var(--blue-bright); }
+  .disclaimer{ color:var(--muted-2); font-size:12px; margin-top:28px; line-height:1.7; max-width:720px; }
+
+  .portal-stack{ display:flex; flex-direction:column; gap:18px; }
+  .portal-card{
+    background:rgba(16,16,19,0.95); border:1px solid var(--border); border-radius:14px;
+    padding:22px; box-shadow:0 18px 40px -24px rgba(0,0,0,0.8);
+  }
+  .portal-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; }
+  .portal-label{ font-family:'JetBrains Mono'; font-size:11px; color:var(--blue-bright); letter-spacing:0.08em; text-transform:uppercase; }
+  .portal-badge{ display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:999px; background:var(--blue-dim); color:var(--blue-bright); font-size:11px; font-weight:600; }
+  .portal-badge.alt{ background:rgba(55,214,122,0.15); color:var(--green); }
+  .portal-field{ display:flex; flex-direction:column; gap:7px; margin-bottom:12px; }
+  .portal-field label{ font-size:12.5px; color:var(--muted); }
+  .portal-field input{
+    width:100%; border:1px solid var(--border); border-radius:9px; background:#0c0c0e; color:var(--text);
+    padding:10px 12px; font-size:14px; outline:none; transition:border-color .18s ease, box-shadow .18s ease;
+  }
+  .portal-field input:focus{ border-color:var(--blue-bright); box-shadow:0 0 0 3px rgba(91,147,255,0.16); }
+  .portal-actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+  .portal-result{ margin-top:14px; padding:12px 14px; border-radius:10px; background:rgba(43,107,255,0.1); border:1px solid rgba(43,107,255,0.22); color:var(--text); font-size:13px; line-height:1.6; }
+  .portal-result strong{ color:var(--blue-bright); }
+  .portal-admin{ margin-top:14px; padding:12px 14px; border-radius:10px; border:1px solid var(--border); background:rgba(255,255,255,0.025); }
+  .portal-admin-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; font-size:12px; color:var(--muted); }
+  .portal-list{ display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+  .portal-list .mini-box{ padding:10px; border-radius:8px; background:#0c0c0e; border:1px solid var(--border); font-size:12px; color:var(--muted); }
+  .hidden{ display:none !important; }
+
+  @media (max-width:900px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .hero h1{ font-size:38px; }
+    .feature-grid{ grid-template-columns:1fr; }
+    .get-panel{ grid-template-columns:1fr; }
+    .nav-links{ display:none; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="glow-orb"></div>
+
+<nav>
+  <div class="wrap">
+    <div class="logo"><div class="logo-mark">B</div>Blud Client</div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#get">Get Script</a>
+      <a href="#changelog">Changelog</a>
+      <a href="#">Discord</a>
+    </div>
+    <div class="nav-right">
+      <a href="#get" class="btn btn-sm">Get Blud</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow"><span class="dot"></span> v4.2 · all games supported</div>
+      <h1>One script.<br>Every <span>Roblox</span> game.</h1>
+      <p class="lead">Blud Client is a lightweight script hub built for speed — instant loadstring, clean UI, and a keybind menu that stays out of your way while you play. The key system is live, and our friend is still building the main Blue script, with more updates coming soon.</p>
+      <div class="hero-actions">
+        <a href="#get" class="btn btn-solid">Get the script</a>
+        <a href="#features" class="btn btn-ghost">See features</a>
+      </div>
+      <div class="hero-meta">
+        <div><strong>—</strong>&nbsp;no key system</div>
+        <div><strong>—</strong>&nbsp;auto-updates</div>
+        <div><strong>—</strong>&nbsp;works on mobile</div>
+      </div>
+    </div>
+
+    <div class="gui-mock" id="guiMock">
+      <div class="gui-titlebar">
+        <div class="t-left">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <div class="title">Blud Client — v4.2</div>
+        </div>
+        <div class="title">RightShift to toggle</div>
+      </div>
+      <div class="gui-body">
+        <div class="gui-tabs" id="guiTabs">
+          <div class="gui-tab active" data-tab="0"><span class="ic"></span>Player</div>
+          <div class="gui-tab" data-tab="1"><span class="ic"></span>Visuals</div>
+          <div class="gui-tab" data-tab="2"><span class="ic"></span>Misc</div>
+          <div class="gui-tab" data-tab="3"><span class="ic"></span>Settings</div>
+        </div>
+        <div class="gui-panel">
+          <h4>Player</h4>
+          <div class="gui-row">Speed boost <div class="toggle on" data-toggle></div></div>
+          <div class="gui-row">Infinite jump <div class="toggle on" data-toggle></div></div>
+          <div class="gui-row">Noclip <div class="toggle" data-toggle></div></div>
+          <div class="gui-row">Anti-AFK <div class="toggle on" data-toggle></div></div>
+          <div class="gui-row">Walk speed
+            <div class="gui-slider" data-slider>
+              <div class="fill" style="width:55%"></div>
+              <div class="knob" style="left:55%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-label">// features</span>
+      <h2>Everything folded into one menu</h2>
+      <p>No bloat, no five different hubs open at once. Blud keeps every tool a session actually needs in a single tabbed window.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature">
+        <div class="feature-icon">01</div>
+        <h3>Universal script hub</h3>
+        <p>Detects the game you're in and loads the right module set automatically — no manual selection.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">02</div>
+        <h3>Autofarm & grinding</h3>
+        <p>Set-and-forget farming loops for supported simulator and tycoon-style games.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">03</div>
+        <h3>ESP & visuals</h3>
+        <p>Player, item, and chest ESP with adjustable distance and team-color filtering.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">04</div>
+        <h3>Movement tools</h3>
+        <p>Speed, noclip, infinite jump, and fly, each with its own keybind and slider.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">05</div>
+        <h3>Keybind menu</h3>
+        <p>Rebind anything from the settings tab — no digging through config files.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">06</div>
+        <h3>Saved configs</h3>
+        <p>Your toggle states and sliders persist between sessions, per game.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="get">
+  <div class="wrap">
+    <div class="get-panel">
+      <div class="get-copy">
+        <h2>Access the key system</h2>
+        <p>Join the Discord, sign in, and generate a key for the client. Our friend is still polishing the main Blue script, and more updates are coming soon.</p>
+        <div class="get-steps">
+          <div class="get-step"><div class="step-num">1</div><div>Open <b>any compatible executor</b> alongside Roblox.</div></div>
+          <div class="get-step"><div class="step-num">2</div><div>Copy the loader on the right and <b>execute it</b>.</div></div>
+          <div class="get-step"><div class="step-num">3</div><div>Use the portal to generate a key and access the client.</div></div>
+        </div>
+        <a href="#access" class="btn btn-solid btn-block">Open key portal</a>
+      </div>
+      <div class="portal-stack">
+        <div class="code-box">
+          <div class="code-head">
+            <span>loadstring.lua</span>
+            <button class="copy-btn" id="copyBtn">Copy</button>
+          </div>
+          <div class="code-body"><span class="c3">-- Blud Client · loader</span><br>
+<span class="c1">loadstring</span>(<span class="c2">game:HttpGet</span>(<span class="c2">"https://your-app-name.onrender.com/loader.lua"</span>))()</div>
+        </div>
+
+        <div class="portal-card" id="access">
+          <div class="portal-head">
+            <div>
+              <div class="portal-label">BLUD KEY PORTAL</div>
+              <div style="margin-top:4px; font-size:13px; color:var(--text);">Generate and manage access keys</div>
+            </div>
+            <span class="portal-badge" id="member-badge">Login required</span>
+          </div>
+
+          <div class="portal-field">
+            <label for="validity-input">Validity (days)</label>
+            <input id="validity-input" type="number" min="1" value="1" />
+          </div>
+          <div class="portal-field">
+            <label for="label-input">Label</label>
+            <input id="label-input" type="text" placeholder="e.g. Tester, VIP" />
+          </div>
+
+          <button id="generate-btn" class="btn btn-solid btn-block">Generate key</button>
+          <div class="portal-actions">
+            <button id="login-btn" class="btn btn-ghost btn-sm">Login with Discord</button>
+            <a id="discord-join" class="btn btn-sm" target="_blank" rel="noreferrer">Join Discord</a>
+          </div>
+
+          <div id="result-box" class="portal-result">Sign in to unlock your key access.</div>
+
+          <div id="admin-card" class="portal-admin hidden">
+            <div class="portal-admin-head">
+              <span>Admin controls</span>
+              <button id="unlimited-btn" class="btn btn-sm">Unlimited key</button>
+            </div>
+            <button id="revoke-btn" class="btn btn-sm">Revoke key</button>
+            <div id="admin-form" class="hidden" style="margin-top:10px;">
+              <div class="portal-field">
+                <label for="revoke-input">Key to revoke</label>
+                <input id="revoke-input" type="text" placeholder="ENTER KEY" />
+              </div>
+              <button id="confirm-revoke" class="btn btn-solid btn-sm">Confirm revoke</button>
+            </div>
+            <div id="admin-list" class="portal-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="changelog">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-label">// changelog</span>
+      <h2>Recently shipped</h2>
+      <p>Blud updates fast after game patches. Here's what changed most recently.</p>
+    </div>
+    <div class="changelog">
+      <div class="log-entry">
+        <div class="log-version">v4.2</div>
+        <div class="log-content">
+          <h4>Faster game detection <span class="log-tag">latest</span></h4>
+          <p>Cut initial load time roughly in half and fixed a UI freeze on slower devices.</p>
+        </div>
+      </div>
+      <div class="log-entry">
+        <div class="log-version">v4.1</div>
+        <div class="log-content">
+          <h4>Mobile layout pass</h4>
+          <p>Rebuilt the toggle menu for touch screens with larger hit areas.</p>
+        </div>
+      </div>
+      <div class="log-entry">
+        <div class="log-version">v4.0</div>
+        <div class="log-content">
+          <h4>New settings tab</h4>
+          <p>Keybinds, config saving, and a theme picker moved into their own panel.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="logo"><div class="logo-mark">B</div>Blud Client</div>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#get">Get Script</a>
+        <a href="#changelog">Changelog</a>
+        <a href="#">Discord</a>
+      </div>
+    </div>
+    <p class="disclaimer">Blud Client is a fan-made script hub and is not affiliated with, endorsed by, or connected to Roblox Corporation. Use of third-party scripts may violate Roblox's Terms of Use — use at your own risk.</p>
+  </div>
+</footer>
+
+<script>
+  // Tab switching in the hero GUI mock
+  const panelContent = [
+    { title: 'Player', rows: [
+        {label:'Speed boost', on:true},
+        {label:'Infinite jump', on:true},
+        {label:'Noclip', on:false},
+        {label:'Anti-AFK', on:true},
+      ], slider: {label:'Walk speed', pct:55}
+    },
+    { title: 'Visuals', rows: [
+        {label:'Player ESP', on:true},
+        {label:'Item ESP', on:false},
+        {label:'Chams', on:false},
+        {label:'Fullbright', on:true},
+      ], slider: {label:'ESP distance', pct:70}
+    },
+    { title: 'Misc', rows: [
+        {label:'Autofarm', on:true},
+        {label:'Auto-collect', on:true},
+        {label:'Server hop', on:false},
+        {label:'Anti-kick', on:true},
+      ], slider: {label:'Farm interval', pct:30}
+    },
+    { title: 'Settings', rows: [
+        {label:'Save config', on:true},
+        {label:'Sound on toggle', on:false},
+        {label:'Blue theme', on:true},
+        {label:'Compact mode', on:false},
+      ], slider: {label:'UI scale', pct:50}
+    },
+  ];
+
+  const tabs = document.querySelectorAll('.gui-tab');
+  const panel = document.querySelector('.gui-panel');
+
+  function renderPanel(i){
+    const data = panelContent[i];
+    let rowsHtml = data.rows.map(r =>
+      `<div class="gui-row">${r.label} <div class="toggle ${r.on ? 'on':''}" data-toggle></div></div>`
+    ).join('');
+    rowsHtml += `<div class="gui-row">${data.slider.label}
+      <div class="gui-slider" data-slider>
+        <div class="fill" style="width:${data.slider.pct}%"></div>
+        <div class="knob" style="left:${data.slider.pct}%"></div>
+      </div></div>`;
+    panel.innerHTML = `<h4>${data.title}</h4>${rowsHtml}`;
+    attachInteractions();
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      renderPanel(Number(tab.dataset.tab));
+    });
+  });
+
+  function attachInteractions(){
+    document.querySelectorAll('[data-toggle]').forEach(t => {
+      t.onclick = () => t.classList.toggle('on');
+    });
+    document.querySelectorAll('[data-slider]').forEach(s => {
+      s.onclick = (e) => {
+        const rect = s.getBoundingClientRect();
+        let pct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+        s.querySelector('.fill').style.width = pct + '%';
+        s.querySelector('.knob').style.left = pct + '%';
+      };
+    });
+  }
+  attachInteractions();
+
+  // Copy loadstring
+  const copyBtn = document.getElementById('copyBtn');
+  copyBtn.addEventListener('click', () => {
+    const script = 'loadstring(game:HttpGet("' + (window.location.origin || 'https://your-app-name.onrender.com') + '/loader.lua"))()';
+    navigator.clipboard.writeText(script).then(() => {
+      copyBtn.textContent = 'Copied';
+      setTimeout(() => copyBtn.textContent = 'Copy', 1500);
+    });
+  });
+
+  // Key portal
+  const loginBtn = document.getElementById('login-btn');
+  const discordJoin = document.getElementById('discord-join');
+  const generateBtn = document.getElementById('generate-btn');
+  const validityInput = document.getElementById('validity-input');
+  const labelInput = document.getElementById('label-input');
+  const resultBox = document.getElementById('result-box');
+  const memberBadge = document.getElementById('member-badge');
+  const adminCard = document.getElementById('admin-card');
+  const unlimitedBtn = document.getElementById('unlimited-btn');
+  const revokeBtn = document.getElementById('revoke-btn');
+  const adminForm = document.getElementById('admin-form');
+  const revokeInput = document.getElementById('revoke-input');
+  const confirmRevoke = document.getElementById('confirm-revoke');
+  const adminList = document.getElementById('admin-list');
+
+  let session = null;
+  let config = null;
+
+  async function loadConfig() {
+    const res = await fetch('/config');
+    config = await res.json();
+    discordJoin.href = config.discordInvite || '#';
+  }
+
+  async function loadSession() {
+    const res = await fetch('/session');
+    session = await res.json();
+    renderSession();
+  }
+
+  function renderSession() {
+    if (!session?.loggedIn) {
+      loginBtn.textContent = 'Login with Discord';
+      memberBadge.textContent = 'Login required';
+      memberBadge.classList.remove('alt');
+      adminCard.classList.add('hidden');
+      return;
+    }
+
+    if (session.memberOfGuild) {
+      memberBadge.textContent = 'Discord member';
+      memberBadge.classList.add('alt');
+    } else {
+      memberBadge.textContent = 'Join Discord first';
+      memberBadge.classList.remove('alt');
+    }
+
+    loginBtn.textContent = session.user?.username ? `${session.user.username}#${session.user.discriminator}` : 'Logged in';
+    if (session.isAdmin) {
+      adminCard.classList.remove('hidden');
+      loadAdminKeys();
+    } else {
+      adminCard.classList.add('hidden');
+    }
+  }
+
+  loginBtn.addEventListener('click', () => {
+    window.location.href = '/auth/discord';
+  });
+
+  generateBtn.addEventListener('click', async () => {
+    resultBox.textContent = 'Generating...';
+
+    if (!session?.loggedIn) {
+      resultBox.textContent = 'You must log in with Discord first.';
+      return;
+    }
+    if (!session.memberOfGuild) {
+      resultBox.textContent = 'You must join the Discord server before generating a key.';
+      return;
+    }
+
+    const response = await fetch('/web-create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ days: Number(validityInput.value), label: labelInput.value })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      resultBox.innerHTML = `<strong>${data.error || 'Failed to generate key.'}</strong>`;
+      return;
+    }
+
+    resultBox.innerHTML = `<strong>Your key:</strong><br>${data.key}<br><small>Expires: ${new Date(data.expiresAt).toLocaleString()}</small>`;
+  });
+
+  unlimitedBtn.addEventListener('click', async () => {
+    const label = prompt('Unlimited key label (optional)');
+    if (label === null) return;
+    adminList.innerHTML = '<div class="mini-box">Generating unlimited key...</div>';
+    const response = await fetch('/admin/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ label, unlimited: true })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      adminList.innerHTML = `<div class="mini-box">${data.error || 'Failed to create key.'}</div>`;
+      return;
+    }
+    adminList.innerHTML = `<div class="mini-box"><strong>Unlimited key:</strong><br>${data.key}</div>`;
+    loadAdminKeys();
+  });
+
+  revokeBtn.addEventListener('click', () => {
+    adminForm.classList.toggle('hidden');
+  });
+
+  confirmRevoke.addEventListener('click', async () => {
+    const key = revokeInput.value.trim();
+    if (!key) return;
+    const response = await fetch('/admin/revoke', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      adminList.innerHTML = `<div class="mini-box">${data.error || 'Failed to revoke key.'}</div>`;
+      return;
+    }
+    adminList.innerHTML = `<div class="mini-box">Revoked ${data.key}</div>`;
+    loadAdminKeys();
+  });
+
+  async function loadAdminKeys() {
+    if (!session?.isAdmin) return;
+    const response = await fetch('/admin/keys');
+    const keys = await response.json();
+    adminList.innerHTML = '';
+    const entries = Object.entries(keys).slice(0, 10);
+    if (entries.length === 0) {
+      adminList.innerHTML = '<div class="mini-box">No keys yet.</div>';
+      return;
+    }
+    entries.forEach(([key, info]) => {
+      const item = document.createElement('div');
+      item.className = 'mini-box';
+      item.innerHTML = `<strong>${key}</strong><br>${info.label || 'No label'} · ${info.active === false ? 'Revoked' : info.unlimited ? 'Unlimited' : 'Expires ' + new Date(info.expiresAt).toLocaleString()}`;
+      adminList.appendChild(item);
+    });
+  }
+
+  (async () => {
+    await loadConfig();
+    await loadSession();
+  })();
+</script>
+
+</body>
+</html>
