@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLUD Access Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <div class="hero-panel">
+      <div class="hero-header">
+        <div>
+          <p class="eyebrow">BLUD KEY PORTAL</p>
+          <h1>Secure Access for BLUD Client</h1>
+          <p class="subtitle">Join Discord, generate a time-limited key, and unlock the client.</p>
+        </div>
+        <div class="hero-actions">
+          <a id="discord-join" class="button button-secondary" target="_blank" rel="noreferrer">Join Discord</a>
+          <button id="login-btn" class="button button-primary">Login with Discord</button>
+        </div>
+      </div>
+
+      <div class="card card-panel">
+        <div class="card-header">
+          <div>
+            <p class="card-title">Generate Your Key</p>
+            <p class="card-copy">Only Discord members can request a key.</p>
+          </div>
+          <span class="badge" id="member-badge">Membership required</span>
+        </div>
+
+        <div class="card-body">
+          <div class="input-row">
+            <label>Validity (days)</label>
+            <input id="validity-input" type="number" min="1" value="1" />
+          </div>
+          <div class="input-row">
+            <label>Label</label>
+            <input id="label-input" type="text" placeholder="e.g. VIP, Tester" />
+          </div>
+          <button id="generate-btn" class="button button-primary">Generate Key</button>
+          <div id="result-box" class="result-box hidden"></div>
+          <p class="form-note">Keys are valid only while active and not revoked.</p>
+        </div>
+      </div>
+
+      <div class="admin-card hidden" id="admin-card">
+        <div class="admin-header">
+          <p class="card-title">Admin Control</p>
+          <span class="badge badge-alt">Admin</span>
+        </div>
+        <div class="admin-body">
+          <button id="unlimited-btn" class="button button-secondary">Create Unlimited Key</button>
+          <button id="revoke-btn" class="button button-secondary">Revoke Key</button>
+          <div class="admin-form hidden" id="admin-form">
+            <div class="input-row"><label>Key to revoke</label><input id="revoke-input" type="text" placeholder="ENTER KEY" /></div>
+            <button id="confirm-revoke" class="button button-danger">Confirm Revoke</button>
+          </div>
+          <div class="admin-list" id="admin-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
