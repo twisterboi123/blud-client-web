@@ -313,10 +313,14 @@ app.post('/create', (req, res) => {
   res.json({ key, expiresAt: keys[key].expiresAt });
 });
 
-app.listen(PORT, () => console.log(`Key API listening on http://localhost:${PORT}`));
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => console.log(`Key API listening on http://localhost:${PORT}`));
+}
+
+module.exports = app;
 
 // Discord Bot (simple command: !genkey <days>)
-if (DISCORD_TOKEN) {
+if (DISCORD_TOKEN && !process.env.VERCEL) {
   const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
   client.on('ready', () => {
