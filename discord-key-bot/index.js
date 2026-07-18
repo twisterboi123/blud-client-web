@@ -135,7 +135,10 @@ app.use(express.json());
 app.use(cookieSession({
   name: 'blud_session',
   keys: [COOKIE_SECRET],
-  maxAge: 24 * 60 * 60 * 1000
+  maxAge: 24 * 60 * 60 * 1000,
+  secure: process.env.NODE_ENV === 'production' || process.env.VERCEL === '1',
+  httpOnly: true,
+  sameSite: 'lax'
 }));
 
 app.get('/', (req, res) => {
