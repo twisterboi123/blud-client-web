@@ -78,7 +78,7 @@ function syncActiveKeyTextFile(keys){
   const now = Date.now();
   const lines = Object.entries(keys)
     .filter(([, entry]) => entry && entry.active !== false && (entry.expiresAt === null || entry.expiresAt > now))
-    .map(([key, entry]) => `${key}|${entry.expiresAt ?? ''}|${encodeURIComponent(entry.label || '')}`);
+    .map(([key]) => key);
   storage.keyText = lines.join('\n');
   try {
     fs.writeFileSync(KEY_TEXT_FILE, storage.keyText);
