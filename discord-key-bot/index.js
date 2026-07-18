@@ -9,10 +9,21 @@ const KEYS_FILE = path.join(__dirname, 'keys.json');
 const KEY_TEXT_FILE = path.join(__dirname, 'keys.txt');
 const SITE_HTML_PATH = path.join(__dirname, '..', 'new', 'index.html');
 const PORT = process.env.PORT || 3000;
+const storage = globalThis.__bludStorage || (globalThis.__bludStorage = { keys: {}, keyText: '' });
 
 function ensureKeyTextFile(){
-  if (!fs.existsSync(KEY_TEXT_FILE)) {
-    fs.writeFileSync(KEY_TEXT_FILE, '');
+  if (process.env.VERCEL) {
+    storage.keyText = storage.keyText || '';
+    return;
+  }
+  try {
+    if (!fs.existsSync(KEY_TEXT_FILE)) {
+      fs.writeFileSync(KEY_TEXT_FILE, '');
+    }
+  } catch (err) {
+    if (err && err.code !== 'EROFS' && err.code !== 'EPERM') {
+      throw err;
+    }
   }
 }
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN || '';
@@ -33,12 +44,22 @@ function loadKeys(){
     return keys;
   } catch(e) {
     ensureKeyTextFile();
-    return {};
+    const keys = storage.keys || {};
+    pruneExpiredKeys(keys);
+    storage.keys = keys;
+    return keys;
   }
 }
 function saveKeys(obj){
+  storage.keys = obj;
   ensureKeyTextFile();
-  fs.writeFileSync(KEYS_FILE, JSON.stringify(obj, null, 2));
+  try {
+    fs.writeFileSync(KEYS_FILE, JSON.stringify(obj, null, 2));
+  } catch (err) {
+    if (err && err.code !== 'EROFS' && err.code !== 'EPERM') {
+      throw err;
+    }
+  }
   syncActiveKeyTextFile(obj);
 }
 function pruneExpiredKeys(keys){
@@ -58,10 +79,18 @@ function syncActiveKeyTextFile(keys){
   const lines = Object.entries(keys)
     .filter(([, entry]) => entry && entry.active !== false && (entry.expiresAt === null || entry.expiresAt > now))
     .map(([key, entry]) => `${key}|${entry.expiresAt ?? ''}|${encodeURIComponent(entry.label || '')}`);
-  fs.writeFileSync(KEY_TEXT_FILE, lines.join('\n'));
+  storage.keyText = lines.join('\n');
+  try {
+    fs.writeFileSync(KEY_TEXT_FILE, storage.keyText);
+  } catch (err) {
+    if (err && err.code !== 'EROFS' && err.code !== 'EPERM') {
+      throw err;
+    }
+  }
 }
 
 function startKeyCleanupLoop(){
+  if (process.env.VERCEL) return;
   setInterval(() => {
     loadKeys();
   }, 60000);
@@ -118,7 +147,7 @@ app.get('/keys.txt', (req, res) => {
   ensureKeyTextFile();
   loadKeys();
   res.type('text/plain');
-  res.sendFile(KEY_TEXT_FILE);
+  res.send(storage.keyText || '');
 });
 
 app.get('/loader.lua', (req, res) => {
