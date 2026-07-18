@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node index.js"
+    "start": "node discord-key-bot/index.js"
   },
   "dependencies": {
     "cookie-session": "^2.0.0",
