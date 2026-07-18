@@ -330,17 +330,17 @@
 <header class="hero">
   <div class="wrap hero-grid">
     <div>
-      <div class="eyebrow"><span class="dot"></span> v4.2 · all games supported</div>
-      <h1>One script.<br>Every <span>Roblox</span> game.</h1>
-      <p class="lead">Blud Client is a lightweight script hub built for speed — instant loadstring, clean UI, and a keybind menu that stays out of your way while you play. The key system is live, and our friend is still building the main Blue script, with more updates coming soon.</p>
+      <div class="eyebrow"><span class="dot"></span> v4.2 · desktop executor only</div>
+      <h1>One script.<br>Focused on <span>movement</span> tools.</h1>
+      <p class="lead">Blud Client is a lightweight Roblox loader with secure key validation and simple in-game tools. This build supports fly, speed boost, player highlight, teleport, and follow — more features are coming soon.</p>
       <div class="hero-actions">
         <a href="#get" class="btn btn-solid">Get the script</a>
         <a href="#features" class="btn btn-ghost">See features</a>
       </div>
       <div class="hero-meta">
-        <div><strong>—</strong>&nbsp;no key system</div>
-        <div><strong>—</strong>&nbsp;auto-updates</div>
-        <div><strong>—</strong>&nbsp;works on mobile</div>
+        <div><strong>—</strong>&nbsp;secure key validation</div>
+        <div><strong>—</strong>&nbsp;desktop executor only</div>
+        <div><strong>—</strong>&nbsp;fly, speed, highlight, teleport</div>
       </div>
     </div>
 
@@ -387,33 +387,33 @@
     <div class="feature-grid">
       <div class="feature">
         <div class="feature-icon">01</div>
-        <h3>Universal script hub</h3>
-        <p>Detects the game you're in and loads the right module set automatically — no manual selection.</p>
+        <h3>Secure key validation</h3>
+        <p>Keys are verified on the server so the client never downloads the full key list.</p>
       </div>
       <div class="feature">
         <div class="feature-icon">02</div>
-        <h3>Autofarm & grinding</h3>
-        <p>Set-and-forget farming loops for supported simulator and tycoon-style games.</p>
+        <h3>Fly & speed boost</h3>
+        <p>Toggle fly, move faster with speed boost, and control flight with WASD + Space / Shift.</p>
       </div>
       <div class="feature">
         <div class="feature-icon">03</div>
-        <h3>ESP & visuals</h3>
-        <p>Player, item, and chest ESP with adjustable distance and team-color filtering.</p>
+        <h3>Player highlight</h3>
+        <p>Show a visual highlight around players for easier spotting in-game.</p>
       </div>
       <div class="feature">
         <div class="feature-icon">04</div>
-        <h3>Movement tools</h3>
-        <p>Speed, noclip, infinite jump, and fly, each with its own keybind and slider.</p>
+        <h3>Teleport & follow</h3>
+        <p>Teleport to a selected player or follow them using pathfinding logic.</p>
       </div>
       <div class="feature">
         <div class="feature-icon">05</div>
-        <h3>Keybind menu</h3>
-        <p>Rebind anything from the settings tab — no digging through config files.</p>
+        <h3>Simple UI</h3>
+        <p>Clean tabbed menu with quick toggles and a draggable window.</p>
       </div>
       <div class="feature">
         <div class="feature-icon">06</div>
-        <h3>Saved configs</h3>
-        <p>Your toggle states and sliders persist between sessions, per game.</p>
+        <h3>Desktop executor only</h3>
+        <p>Designed for PC executors; the current build does not support mobile execution.</p>
       </div>
     </div>
   </div>
@@ -452,12 +452,8 @@
           </div>
 
           <div class="portal-field">
-            <label for="validity-input">Validity (days)</label>
-            <input id="validity-input" type="number" min="1" value="1" />
-          </div>
-          <div class="portal-field">
-            <label for="label-input">Label</label>
-            <input id="label-input" type="text" placeholder="e.g. Tester, VIP" />
+            <label>Free 1-day key</label>
+            <div style="padding:12px 14px; border:1px solid var(--border); border-radius:9px; background:#0c0c0e; color:var(--text);">Each Discord account may generate one free active 1-day key. Admin users can issue longer or unlimited keys separately.</div>
           </div>
 
           <button id="generate-btn" class="btn btn-solid btn-block">Generate key</button>
@@ -466,7 +462,7 @@
             <a id="discord-join" class="btn btn-sm" target="_blank" rel="noreferrer">Join Discord</a>
           </div>
 
-          <div id="result-box" class="portal-result">Sign in to unlock your key access.</div>
+          <div id="result-box" class="portal-result">Sign in to unlock your free 1-day key.</div>
 
           <div id="admin-card" class="portal-admin hidden">
             <div class="portal-admin-head">
@@ -507,8 +503,8 @@
       <div class="log-entry">
         <div class="log-version">v4.1</div>
         <div class="log-content">
-          <h4>Mobile layout pass</h4>
-          <p>Rebuilt the toggle menu for touch screens with larger hit areas.</p>
+          <h4>UI polish</h4>
+          <p>Improved the client menu layout and made the toggles easier to use on desktop.</p>
         </div>
       </div>
       <div class="log-entry">
@@ -624,8 +620,6 @@
   const loginBtn = document.getElementById('login-btn');
   const discordJoin = document.getElementById('discord-join');
   const generateBtn = document.getElementById('generate-btn');
-  const validityInput = document.getElementById('validity-input');
-  const labelInput = document.getElementById('label-input');
   const resultBox = document.getElementById('result-box');
   const memberBadge = document.getElementById('member-badge');
   const adminCard = document.getElementById('admin-card');
@@ -696,7 +690,7 @@
     const response = await fetch('/web-create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ days: Number(validityInput.value), label: labelInput.value })
+      body: JSON.stringify({ days: 1 })
     });
 
     const data = await response.json();

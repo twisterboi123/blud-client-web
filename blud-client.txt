@@ -10,14 +10,14 @@ local player = Players.LocalPlayer
 -- THEME (matches the Blud Client site: near-black + blue hover)
 ----------------------------------------------------------------
 local theme = {
-	bgMain       = Color3.fromRGB(8, 8, 10),     -- window background
-	bgSidebar    = Color3.fromRGB(13, 13, 16),   -- sidebar background
-	bgSurface2   = Color3.fromRGB(16, 16, 20),   -- default button / input surface
-	border       = Color3.fromRGB(34, 34, 40),   -- default hairline border
-	borderHover  = Color3.fromRGB(91, 147, 255), -- blue border on hover
-	blue         = Color3.fromRGB(43, 107, 255), -- accent blue
-	blueBright   = Color3.fromRGB(91, 147, 255), -- lighter blue (hover/press)
-	blueRow      = Color3.fromRGB(24, 48, 102),  -- muted blue for list-row hover
+	bgMain       = Color3.fromRGB(8, 8, 10),
+	bgSidebar    = Color3.fromRGB(13, 13, 16),
+	bgSurface2   = Color3.fromRGB(16, 16, 20),
+	border       = Color3.fromRGB(34, 34, 40),
+	borderHover  = Color3.fromRGB(91, 147, 255),
+	blue         = Color3.fromRGB(43, 107, 255),
+	blueBright   = Color3.fromRGB(91, 147, 255),
+	blueRow      = Color3.fromRGB(24, 48, 102),
 	textPrimary  = Color3.fromRGB(255, 255, 255),
 	textMuted    = Color3.fromRGB(150, 150, 158),
 	success      = Color3.fromRGB(70, 200, 120),
@@ -38,12 +38,11 @@ local settings = {
 
 ----------------------------------------------------------------
 -- KEY SYSTEM CONFIG
--- Uses secure backend validation (keys are never exposed publicly)
 ----------------------------------------------------------------
 local keySystem = {
-	validationUrl  = "https://www.bludclient.site/validate-key", -- backend validation endpoint
-	getKeyUrl      = "https://www.bludclient.site/", -- page to get a key
-	saveKeyLocally = false,               -- remembers a valid key between sessions (needs writefile/readfile/isfile)
+	validationUrl  = "https://www.bludclient.site/validate-key",
+	getKeyUrl      = "https://www.bludclient.site/",
+	saveKeyLocally = false,
 	saveFile       = "BludClientKey.txt"
 }
 
@@ -323,12 +322,7 @@ local function startFollowing(targetPlayer)
 end
 
 ----------------------------------------------------------------
--- HTTP REQUEST BYPASS
--- HttpService:HttpGet only works if the *game* has HttpEnabled turned on,
--- and some games turn it off specifically to block scripts like this one.
--- Executors expose their own request function that talks to the outside
--- world directly rather than going through Roblox's HttpService, so we
--- prefer that and only fall back to HttpService if nothing else exists.
+-- HTTP REQUEST FUNCTION
 ----------------------------------------------------------------
 local function httpRequest(method, url, body)
 	local requestFunc = (syn and syn.request)
@@ -355,7 +349,6 @@ local function httpRequest(method, url, body)
 		end
 	end
 
-	-- Fallback to HttpService
 	if method == "POST" then
 		local ok, result = pcall(function()
 			return game:HttpPost(url, body or "", Enum.HttpContentType.ApplicationJson)
@@ -372,7 +365,7 @@ local function httpRequest(method, url, body)
 end
 
 ----------------------------------------------------------------
--- KEY VERIFICATION (now uses secure backend)
+-- KEY VERIFICATION (SECURE BACKEND)
 ----------------------------------------------------------------
 local function verifyKey(keyText)
 	if not keyText or keyText:gsub("%s", "") == "" then
@@ -689,7 +682,7 @@ local function buildKeyGui()
 end
 
 ----------------------------------------------------------------
--- MAIN CLIENT (built only after a valid key is entered)
+-- MAIN CLIENT
 ----------------------------------------------------------------
 function buildMainClient()
 	local screenGui = Instance.new("ScreenGui")
@@ -697,9 +690,6 @@ function buildMainClient()
 	screenGui.ResetOnSpawn = false
 	screenGui.Parent = player:WaitForChild("PlayerGui")
 
-	----------------------------------------------------------------
-	-- MAIN FRAME
-	----------------------------------------------------------------
 	local mainFrame = Instance.new("Frame")
 	mainFrame.Name = "MainFrame"
 	mainFrame.Size = UDim2.new(0, 400, 0, 320)
@@ -718,7 +708,6 @@ function buildMainClient()
 	mainStroke.Thickness = 1.5
 	mainStroke.Parent = mainFrame
 
-	-- Title Bar (Full width, on top)
 	local titleBar = Instance.new("Frame")
 	titleBar.Name = "TitleBar"
 	titleBar.Size = UDim2.new(1, 0, 0, 40)
@@ -761,7 +750,6 @@ function buildMainClient()
 		TweenService:Create(minimizeButton, TweenInfo.new(0.15), {BackgroundColor3 = theme.bgSurface2}):Play()
 	end)
 
-	-- Sidebar (Below title bar)
 	local sidebar = Instance.new("Frame")
 	sidebar.Name = "Sidebar"
 	sidebar.Size = UDim2.new(0, 100, 1, -40)
@@ -779,7 +767,6 @@ function buildMainClient()
 	sidebarLayout.Padding = UDim.new(0, 5)
 	sidebarLayout.Parent = sidebar
 
-	-- Content Area
 	local contentFrame = Instance.new("Frame")
 	contentFrame.Name = "Content"
 	contentFrame.Size = UDim2.new(1, -110, 1, -50)
@@ -788,7 +775,6 @@ function buildMainClient()
 	contentFrame.ZIndex = 2
 	contentFrame.Parent = mainFrame
 
-	-- Category title
 	local categoryTitle = Instance.new("TextLabel")
 	categoryTitle.Size = UDim2.new(1, 0, 0, 30)
 	categoryTitle.BackgroundTransparency = 1
@@ -800,7 +786,6 @@ function buildMainClient()
 	categoryTitle.ZIndex = 2
 	categoryTitle.Parent = contentFrame
 
-	-- Buttons container
 	local buttonsContainer = Instance.new("Frame")
 	buttonsContainer.Size = UDim2.new(1, 0, 1, -35)
 	buttonsContainer.Position = UDim2.new(0, 0, 0, 35)
@@ -836,16 +821,10 @@ function buildMainClient()
 		return btn
 	end
 
-	----------------------------------------------------------------
-	-- CATEGORY BUTTONS
-	----------------------------------------------------------------
 	local movementBtn = createCategoryButton("Movement")
 	local visualsBtn = createCategoryButton("Visuals")
 	local playerBtn = createCategoryButton("Player")
 
-	----------------------------------------------------------------
-	-- BUTTON CREATION PER CATEGORY
-	----------------------------------------------------------------
 	local function clearButtons()
 		for _, child in ipairs(buttonsContainer:GetChildren()) do
 			if child:IsA("TextButton") then
@@ -864,7 +843,6 @@ function buildMainClient()
 		end
 	end
 
-	-- Movement buttons
 	local function createMovementButtons()
 		clearButtons()
 		categoryTitle.Text = "Movement"
@@ -885,22 +863,8 @@ function buildMainClient()
 			toggleSpeedBoost()
 			speedBtn.Text = "Speed: " .. (speedBoostEnabled and "ON" or "OFF")
 		end)
-
-		-- Right click handlers
-		flyBtn.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton2 then
-				openSettingsPopup(flyPopup, flyBtn)
-			end
-		end)
-
-		speedBtn.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton2 then
-				openSettingsPopup(speedPopup, speedBtn)
-			end
-		end)
 	end
 
-	-- Visuals buttons
 	local function createVisualsButtons()
 		clearButtons()
 		categoryTitle.Text = "Visuals"
@@ -910,15 +874,8 @@ function buildMainClient()
 			toggleHighlights()
 			highlightBtn.Text = "Highlight: " .. (highlightEnabled and "ON" or "OFF")
 		end)
-
-		highlightBtn.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton2 then
-				openSettingsPopup(highlightPopup, highlightBtn)
-			end
-		end)
 	end
 
-	-- Player buttons
 	local function createPlayerButtons()
 		clearButtons()
 		categoryTitle.Text = "Player"
@@ -937,17 +894,8 @@ function buildMainClient()
 		followBtn.MouseButton1Click:Connect(function()
 			openSelector("Follow")
 		end)
-
-		followBtn.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton2 then
-				openSettingsPopup(followPopup, followBtn)
-			end
-		end)
 	end
 
-	----------------------------------------------------------------
-	-- CATEGORY SWITCHING
-	----------------------------------------------------------------
 	movementBtn.MouseButton1Click:Connect(function()
 		updateCategoryColors(movementBtn)
 		createMovementButtons()
@@ -963,13 +911,9 @@ function buildMainClient()
 		createPlayerButtons()
 	end)
 
-	-- Show Movement by default
 	updateCategoryColors(movementBtn)
 	createMovementButtons()
 
-	----------------------------------------------------------------
-	-- MINIMIZE LOGIC
-	----------------------------------------------------------------
 	local minimized = false
 	local expandedSize = UDim2.new(0, 400, 0, 320)
 	local minimizedSize = UDim2.new(0, 220, 0, 40)
@@ -986,9 +930,6 @@ function buildMainClient()
 
 	makeDraggable(titleBar, mainFrame)
 
-	----------------------------------------------------------------
-	-- PLAYER SELECTOR POPUP
-	----------------------------------------------------------------
 	local selectedPlayer = nil
 	local currentMode = nil
 
@@ -1010,7 +951,6 @@ function buildMainClient()
 	selectorStroke.Thickness = 1.5
 	selectorStroke.Parent = selectorPopup
 
-	-- Title Bar
 	local selectorTitleBar = Instance.new("Frame")
 	selectorTitleBar.Size = UDim2.new(1, 0, 0, 34)
 	selectorTitleBar.BackgroundTransparency = 1
@@ -1055,7 +995,6 @@ function buildMainClient()
 		selectorPopup.Visible = false
 	end)
 
-	-- Divider
 	local selectorDivider = Instance.new("Frame")
 	selectorDivider.Size = UDim2.new(1, -20, 0, 1)
 	selectorDivider.Position = UDim2.new(0, 10, 0, 34)
@@ -1064,7 +1003,6 @@ function buildMainClient()
 	selectorDivider.ZIndex = 10
 	selectorDivider.Parent = selectorPopup
 
-	-- Selected Label
 	local selectedLabel = Instance.new("TextLabel")
 	selectedLabel.Size = UDim2.new(1, -20, 0, 25)
 	selectedLabel.Position = UDim2.new(0, 10, 0, 42)
@@ -1077,7 +1015,6 @@ function buildMainClient()
 	selectedLabel.ZIndex = 10
 	selectedLabel.Parent = selectorPopup
 
-	-- Scrolling Frame
 	local selectorScroll = Instance.new("ScrollingFrame")
 	selectorScroll.Size = UDim2.new(1, -20, 0, 220)
 	selectorScroll.Position = UDim2.new(0, 10, 0, 72)
@@ -1096,7 +1033,6 @@ function buildMainClient()
 	selectorListLayout.Padding = UDim.new(0, 4)
 	selectorListLayout.Parent = selectorScroll
 
-	-- Confirm Button
 	local confirmButton = Instance.new("TextButton")
 	confirmButton.Size = UDim2.new(1, -20, 0, 40)
 	confirmButton.Position = UDim2.new(0, 10, 0, 300)
@@ -1131,57 +1067,14 @@ function buildMainClient()
 				teleportToPlayer(selectedPlayer)
 			elseif currentMode == "Follow" then
 				startFollowing(selectedPlayer)
-				createPlayerButtons() -- Refresh to show "Following: Name"
+				createPlayerButtons()
 			end
 			selectorPopup.Visible = false
-		else
-			selectedLabel.Text = "Selected: Please select a player!"
-			selectedLabel.TextColor3 = theme.dangerBright
-			task.delay(1.5, function()
-				selectedLabel.Text = "Selected: " .. (selectedPlayer and selectedPlayer.Name or "None")
-				selectedLabel.TextColor3 = theme.textMuted
-			end)
 		end
-	end)
-
-	-- Stop Follow Button
-	local stopFollowButton = Instance.new("TextButton")
-	stopFollowButton.Size = UDim2.new(1, -20, 0, 35)
-	stopFollowButton.Position = UDim2.new(0, 10, 0, 260)
-	stopFollowButton.BackgroundColor3 = theme.danger
-	stopFollowButton.Text = "Stop Following"
-	stopFollowButton.TextColor3 = theme.textPrimary
-	stopFollowButton.TextScaled = true
-	stopFollowButton.Font = Enum.Font.GothamBold
-	stopFollowButton.AutoButtonColor = false
-	stopFollowButton.ZIndex = 10
-	stopFollowButton.Visible = false
-	stopFollowButton.Parent = selectorPopup
-
-	local stopFollowCorner = Instance.new("UICorner")
-	stopFollowCorner.CornerRadius = UDim.new(0, 8)
-	stopFollowCorner.Parent = stopFollowButton
-
-	stopFollowButton.MouseEnter:Connect(function()
-		TweenService:Create(stopFollowButton, TweenInfo.new(0.15), {BackgroundColor3 = theme.dangerBright}):Play()
-	end)
-	stopFollowButton.MouseLeave:Connect(function()
-		TweenService:Create(stopFollowButton, TweenInfo.new(0.15), {BackgroundColor3 = theme.danger}):Play()
-	end)
-
-	stopFollowButton.MouseButton1Click:Connect(function()
-		stopFollowing()
-		createPlayerButtons() -- Refresh button text
-		stopFollowButton.Visible = false
-		confirmButton.Visible = true
-		selectorPopup.Visible = false
 	end)
 
 	makeDraggable(selectorTitleBar, selectorPopup)
 
-	----------------------------------------------------------------
-	-- PLAYER LIST FUNCTIONS
-	----------------------------------------------------------------
 	local playerButtons = {}
 
 	local function createPlayerListButton(targetPlayer)
@@ -1201,16 +1094,6 @@ function buildMainClient()
 		btnCorner.CornerRadius = UDim.new(0, 6)
 		btnCorner.Parent = btn
 
-		btn.MouseEnter:Connect(function()
-			if selectedPlayer ~= targetPlayer then
-				TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = theme.blueRow}):Play()
-			end
-		end)
-		btn.MouseLeave:Connect(function()
-			if selectedPlayer ~= targetPlayer then
-				TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = theme.bgSurface2}):Play()
-			end
-		end)
 		btn.MouseButton1Click:Connect(function()
 			for _, button in pairs(playerButtons) do
 				TweenService:Create(button, TweenInfo.new(0.1), {BackgroundColor3 = theme.bgSurface2}):Play()
@@ -1246,15 +1129,6 @@ function buildMainClient()
 		currentMode = mode
 		selectorTitleLabel.Text = mode .. " - Select Player"
 		selectedLabel.Text = "Selected: None"
-
-		if mode == "Follow" and following then
-			confirmButton.Visible = false
-			stopFollowButton.Visible = true
-		else
-			confirmButton.Visible = true
-			stopFollowButton.Visible = false
-		end
-
 		selectorPopup.Visible = true
 		refreshPlayerList()
 	end
@@ -1279,265 +1153,6 @@ function buildMainClient()
 			selectorScroll.CanvasSize = UDim2.new(0, 0, 0, selectorListLayout.AbsoluteContentSize.Y + 8)
 		end
 	end)
-
-	----------------------------------------------------------------
-	-- SETTINGS POPUPS
-	----------------------------------------------------------------
-	local function createSettingsPopup(popupTitle, rows)
-		local popup = Instance.new("Frame")
-		popup.Name = popupTitle .. "Popup"
-		popup.Size = UDim2.new(0, 200, 0, 40 + (#rows * 45) + 10)
-		popup.BackgroundColor3 = theme.bgMain
-		popup.BorderSizePixel = 0
-		popup.Visible = false
-		popup.ZIndex = 5
-		popup.Parent = screenGui
-
-		local popupCorner = Instance.new("UICorner")
-		popupCorner.CornerRadius = UDim.new(0, 12)
-		popupCorner.Parent = popup
-
-		local popupStroke = Instance.new("UIStroke")
-		popupStroke.Color = theme.border
-		popupStroke.Thickness = 1.5
-		popupStroke.Parent = popup
-
-		local popupTitleBar = Instance.new("Frame")
-		popupTitleBar.Size = UDim2.new(1, 0, 0, 34)
-		popupTitleBar.BackgroundTransparency = 1
-		popupTitleBar.ZIndex = 5
-		popupTitleBar.Parent = popup
-
-		local popupTitleLabel = Instance.new("TextLabel")
-		popupTitleLabel.Size = UDim2.new(1, -40, 1, 0)
-		popupTitleLabel.Position = UDim2.new(0, 10, 0, 0)
-		popupTitleLabel.BackgroundTransparency = 1
-		popupTitleLabel.Text = popupTitle
-		popupTitleLabel.TextColor3 = theme.textPrimary
-		popupTitleLabel.TextScaled = true
-		popupTitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-		popupTitleLabel.Font = Enum.Font.GothamBold
-		popupTitleLabel.ZIndex = 5
-		popupTitleLabel.Parent = popupTitleBar
-
-		local closeButton = Instance.new("TextButton")
-		closeButton.Size = UDim2.new(0, 22, 0, 22)
-		closeButton.Position = UDim2.new(1, -30, 0, 6)
-		closeButton.BackgroundColor3 = theme.bgSurface2
-		closeButton.Text = "X"
-		closeButton.TextColor3 = theme.textPrimary
-		closeButton.TextScaled = true
-		closeButton.Font = Enum.Font.GothamBold
-		closeButton.AutoButtonColor = false
-		closeButton.ZIndex = 5
-		closeButton.Parent = popupTitleBar
-
-		local closeCorner = Instance.new("UICorner")
-		closeCorner.CornerRadius = UDim.new(0, 6)
-		closeCorner.Parent = closeButton
-
-		closeButton.MouseEnter:Connect(function()
-			TweenService:Create(closeButton, TweenInfo.new(0.15), {BackgroundColor3 = theme.danger}):Play()
-		end)
-		closeButton.MouseLeave:Connect(function()
-			TweenService:Create(closeButton, TweenInfo.new(0.15), {BackgroundColor3 = theme.bgSurface2}):Play()
-		end)
-		closeButton.MouseButton1Click:Connect(function()
-			popup.Visible = false
-		end)
-
-		local popupDivider = Instance.new("Frame")
-		popupDivider.Size = UDim2.new(1, -20, 0, 1)
-		popupDivider.Position = UDim2.new(0, 10, 0, 34)
-		popupDivider.BackgroundColor3 = theme.border
-		popupDivider.BorderSizePixel = 0
-		popupDivider.ZIndex = 5
-		popupDivider.Parent = popup
-
-		local popupContent = Instance.new("Frame")
-		popupContent.Size = UDim2.new(1, -20, 1, -44)
-		popupContent.Position = UDim2.new(0, 10, 0, 40)
-		popupContent.BackgroundTransparency = 1
-		popupContent.ZIndex = 5
-		popupContent.Parent = popup
-
-		local popupLayout = Instance.new("UIListLayout")
-		popupLayout.Padding = UDim.new(0, 8)
-		popupLayout.Parent = popupContent
-
-		for i, rowData in ipairs(rows) do
-			local row = Instance.new("Frame")
-			row.Size = UDim2.new(1, 0, 0, 36)
-			row.LayoutOrder = i
-			row.BackgroundTransparency = 1
-			row.ZIndex = 5
-			row.Parent = popupContent
-
-			local label = Instance.new("TextLabel")
-			label.Size = UDim2.new(0.55, 0, 1, 0)
-			label.BackgroundTransparency = 1
-			label.Text = rowData.label
-			label.TextColor3 = theme.textMuted
-			label.TextScaled = true
-			label.Font = Enum.Font.Gotham
-			label.TextXAlignment = Enum.TextXAlignment.Left
-			label.ZIndex = 5
-			label.Parent = row
-
-			local box = Instance.new("TextBox")
-			box.Size = UDim2.new(0.45, -5, 1, -6)
-			box.Position = UDim2.new(0.55, 5, 0, 3)
-			box.BackgroundColor3 = theme.bgSurface2
-			box.Text = tostring(rowData.default)
-			box.TextColor3 = theme.textPrimary
-			box.TextScaled = true
-			box.Font = Enum.Font.Gotham
-			box.ClearTextOnFocus = false
-			box.ZIndex = 5
-			box.Parent = row
-
-			local boxCorner = Instance.new("UICorner")
-			boxCorner.CornerRadius = UDim.new(0, 6)
-			boxCorner.Parent = box
-
-			local boxStroke = Instance.new("UIStroke")
-			boxStroke.Color = theme.border
-			boxStroke.Thickness = 1
-			boxStroke.Parent = box
-
-			box.Focused:Connect(function()
-				TweenService:Create(boxStroke, TweenInfo.new(0.15), {Color = theme.borderHover}):Play()
-			end)
-
-			box.FocusLost:Connect(function()
-				TweenService:Create(boxStroke, TweenInfo.new(0.15), {Color = theme.border}):Play()
-				local num = tonumber(box.Text)
-				if num then
-					num = math.clamp(num, rowData.min or 0, rowData.max or 10000)
-					box.Text = tostring(num)
-					rowData.callback(num)
-				else
-					box.Text = tostring(rowData.default)
-				end
-			end)
-		end
-
-		makeDraggable(popupTitleBar, popup)
-
-		return popup
-	end
-
-	-- Settings Popups
-	flyPopup = createSettingsPopup("Fly Settings", {
-		{
-			label = "Fly Speed",
-			default = settings.flySpeed,
-			min = 1, max = 500,
-			callback = function(val)
-				settings.flySpeed = val
-			end
-		}
-	})
-
-	speedPopup = createSettingsPopup("Speed Settings", {
-		{
-			label = "Multiplier",
-			default = settings.speedMultiplier,
-			min = 1, max = 100,
-			callback = function(val)
-				settings.speedMultiplier = val
-				if speedBoostEnabled then
-					local character = player.Character
-					if character then
-						local humanoid = character:FindFirstChildOfClass("Humanoid")
-						if humanoid then
-							humanoid.WalkSpeed = originalWalkSpeed * settings.speedMultiplier
-						end
-					end
-				end
-			end
-		}
-	})
-
-	followPopup = createSettingsPopup("Follow Settings", {
-		{
-			label = "Distance",
-			default = settings.followDistance,
-			min = 1, max = 50,
-			callback = function(val)
-				settings.followDistance = val
-			end
-		}
-	})
-
-	highlightPopup = createSettingsPopup("Highlight Settings", {
-		{
-			label = "Fill R",
-			default = math.floor(settings.highlightColor.R * 255),
-			min = 0, max = 255,
-			callback = function(val)
-				settings.highlightColor = Color3.fromRGB(val, settings.highlightColor.G * 255, settings.highlightColor.B * 255)
-				if highlightEnabled then refreshAllHighlights() end
-			end
-		},
-		{
-			label = "Fill G",
-			default = math.floor(settings.highlightColor.G * 255),
-			min = 0, max = 255,
-			callback = function(val)
-				settings.highlightColor = Color3.fromRGB(settings.highlightColor.R * 255, val, settings.highlightColor.B * 255)
-				if highlightEnabled then refreshAllHighlights() end
-			end
-		},
-		{
-			label = "Fill B",
-			default = math.floor(settings.highlightColor.B * 255),
-			min = 0, max = 255,
-			callback = function(val)
-				settings.highlightColor = Color3.fromRGB(settings.highlightColor.R * 255, settings.highlightColor.G * 255, val)
-				if highlightEnabled then refreshAllHighlights() end
-			end
-		},
-		{
-			label = "Outline R",
-			default = math.floor(settings.outlineColor.R * 255),
-			min = 0, max = 255,
-			callback = function(val)
-				settings.outlineColor = Color3.fromRGB(val, settings.outlineColor.G * 255, settings.outlineColor.B * 255)
-				if highlightEnabled then refreshAllHighlights() end
-			end
-		},
-		{
-			label = "Outline G",
-			default = math.floor(settings.outlineColor.G * 255),
-			min = 0, max = 255,
-			callback = function(val)
-				settings.outlineColor = Color3.fromRGB(settings.outlineColor.R * 255, val, settings.outlineColor.B * 255)
-				if highlightEnabled then refreshAllHighlights() end
-			end
-		},
-		{
-			label = "Outline B",
-			default = math.floor(settings.outlineColor.B * 255),
-			min = 0, max = 255,
-			callback = function(val)
-				settings.outlineColor = Color3.fromRGB(settings.outlineColor.R * 255, settings.outlineColor.G * 255, val)
-				if highlightEnabled then refreshAllHighlights() end
-			end
-		}
-	})
-
-	function openSettingsPopup(popup, button)
-		local absPos = mainFrame.AbsolutePosition
-		popup.Position = UDim2.new(0, absPos.X + 410, 0, absPos.Y + button.AbsolutePosition.Y - mainFrame.AbsolutePosition.Y + 50)
-
-		highlightPopup.Visible = false
-		flyPopup.Visible = false
-		speedPopup.Visible = false
-		followPopup.Visible = false
-
-		popup.Visible = true
-	end
 end
 
 ----------------------------------------------------------------

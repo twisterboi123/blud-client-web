@@ -294,8 +294,8 @@ function requireAdmin(req, res, next) {
 }
 
 app.post('/web-create', requireLogin, requireGuildMember, (req, res) => {
-  const days = Math.max(1, Number(req.body.days) || 7);
-  const label = req.body.label || '';
+  const days = req.session.isAdmin ? Math.max(1, Number(req.body.days) || 7) : 1;
+  const label = req.session.isAdmin ? req.body.label || '' : '';
   const keys = loadKeys();
 
   if (!req.session.isAdmin) {
@@ -330,6 +330,19 @@ app.post('/admin/revoke', requireLogin, requireAdmin, (req, res) => {
   keys[key].active = false;
   saveKeys(keys);
   res.json({ success: true, key });
+});
+
+app.post('/admin/revoke-all', requireLogin, requireAdmin, (req, res) => {
+  const keys = loadKeys();
+  let count = 0;
+  Object.values(keys).forEach((entry) => {
+    if (entry.active !== false) {
+      entry.active = false;
+      count += 1;
+    }
+  });
+  saveKeys(keys);
+  res.json({ success: true, count });
 });
 
 app.post('/admin/create', requireLogin, requireAdmin, (req, res) => {

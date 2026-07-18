@@ -35,12 +35,8 @@
 
         <div class="card-body">
           <div class="input-row">
-            <label>Validity (days)</label>
-            <input id="validity-input" type="number" min="1" value="1" />
-          </div>
-          <div class="input-row">
-            <label>Label</label>
-            <input id="label-input" type="text" placeholder="e.g. VIP, Tester" />
+            <label>Free 1-day key</label>
+            <div style="padding:12px 14px; border:1px solid #2a2a30; border-radius:8px; background:#09090b; color:#e9e9ec;">Each Discord account may generate one free active 1-day key. Admins can still create longer or unlimited keys using admin controls.</div>
           </div>
           <button id="generate-btn" class="button button-primary">Generate Key</button>
           <div id="result-box" class="result-box hidden"></div>
@@ -54,8 +50,11 @@
           <span class="badge badge-alt">Admin</span>
         </div>
         <div class="admin-body">
-          <button id="unlimited-btn" class="button button-secondary">Create Unlimited Key</button>
-          <button id="revoke-btn" class="button button-secondary">Revoke Key</button>
+          <div class="admin-actions">
+            <button id="unlimited-btn" class="button button-secondary">Create Unlimited Key</button>
+            <button id="revoke-btn" class="button button-secondary">Revoke Key</button>
+            <button id="revoke-all-btn" class="button button-danger">Revoke All Keys</button>
+          </div>
           <div class="admin-form hidden" id="admin-form">
             <div class="input-row"><label>Key to revoke</label><input id="revoke-input" type="text" placeholder="ENTER KEY" /></div>
             <button id="confirm-revoke" class="button button-danger">Confirm Revoke</button>
