@@ -4,14 +4,14 @@
   "buildCommand": "npm run build",
   "builds": [
     {
-      "src": "discord-key-bot/index.js",
+      "src": "api/index.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "discord-key-bot/index.js"
+      "dest": "api/index.js"
     }
   ]
 }
