@@ -178,6 +178,33 @@ app.get('/session', (req, res) => {
   res.json(data);
 });
 
+app.post('/validate-key', (req, res) => {
+  const { key } = req.body;
+  
+  if (!key || typeof key !== 'string') {
+    return res.json({ valid: false });
+  }
+  
+  const keys = loadKeys();
+  const now = Date.now();
+  const entry = keys[key.trim()];
+  
+  if (!entry) {
+    return res.json({ valid: false });
+  }
+  
+  // Check if key is active and not expired
+  if (entry.active === false) {
+    return res.json({ valid: false });
+  }
+  
+  if (entry.expiresAt !== null && entry.expiresAt <= now) {
+    return res.json({ valid: false });
+  }
+  
+  return res.json({ valid: true });
+});
+
 app.get('/auth/discord', (req, res) => {
   const state = Math.random().toString(36).slice(2);
   const params = new URLSearchParams({
