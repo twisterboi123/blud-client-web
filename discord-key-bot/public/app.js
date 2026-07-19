@@ -1,4 +1,5 @@
 const loginBtn = document.getElementById('login-btn');
+const logoutBtn = document.getElementById('logout-btn');
 const discordJoin = document.getElementById('discord-join');
 const generateBtn = document.getElementById('generate-btn');
 const resultBox = document.getElementById('result-box');
@@ -29,12 +30,16 @@ async function loadSession() {
 
 function renderSession() {
   if (!session?.loggedIn) {
-    loginBtn.textContent = 'Login with Discord';
+    loginBtn.classList.remove('hidden');
+    logoutBtn.classList.add('hidden');
     memberBadge.textContent = 'Login required';
     memberBadge.classList.remove('badge-alt');
     adminCard.classList.add('hidden');
     return;
   }
+
+  loginBtn.classList.add('hidden');
+  logoutBtn.classList.remove('hidden');
 
   if (session.memberOfGuild) {
     memberBadge.textContent = 'Discord member';
@@ -44,7 +49,7 @@ function renderSession() {
     memberBadge.classList.remove('badge-alt');
   }
 
-  loginBtn.textContent = session.user.username + '#' + session.user.discriminator;
+  logoutBtn.textContent = 'Logout (' + session.user.username + ')';
   if (session.isAdmin) {
     adminCard.classList.remove('hidden');
     loadAdminKeys();
@@ -53,6 +58,10 @@ function renderSession() {
 
 loginBtn.addEventListener('click', () => {
   window.location.href = '/auth/discord';
+});
+
+logoutBtn.addEventListener('click', () => {
+  window.location.href = '/logout';
 });
 
 generateBtn.addEventListener('click', async () => {

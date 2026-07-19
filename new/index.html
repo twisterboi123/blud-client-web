@@ -459,6 +459,7 @@
           <button id="generate-btn" class="btn btn-solid btn-block">Generate key</button>
           <div class="portal-actions">
             <button id="login-btn" class="btn btn-ghost btn-sm">Login with Discord</button>
+            <button id="logout-btn" class="btn btn-ghost btn-sm hidden">Logout</button>
             <a id="discord-join" class="btn btn-sm" target="_blank" rel="noreferrer">Join Discord</a>
           </div>
 
@@ -618,6 +619,7 @@
 
   // Key portal
   const loginBtn = document.getElementById('login-btn');
+  const logoutBtn = document.getElementById('logout-btn');
   const discordJoin = document.getElementById('discord-join');
   const generateBtn = document.getElementById('generate-btn');
   const resultBox = document.getElementById('result-box');
@@ -647,12 +649,16 @@
 
   function renderSession() {
     if (!session?.loggedIn) {
-      loginBtn.textContent = 'Login with Discord';
+      loginBtn.classList.remove('hidden');
+      logoutBtn.classList.add('hidden');
       memberBadge.textContent = 'Login required';
       memberBadge.classList.remove('alt');
       adminCard.classList.add('hidden');
       return;
     }
+
+    loginBtn.classList.add('hidden');
+    logoutBtn.classList.remove('hidden');
 
     if (session.memberOfGuild) {
       memberBadge.textContent = 'Discord member';
@@ -662,7 +668,7 @@
       memberBadge.classList.remove('alt');
     }
 
-    loginBtn.textContent = session.user?.username ? `${session.user.username}#${session.user.discriminator}` : 'Logged in';
+    logoutBtn.textContent = `Logout (${session.user?.username || 'User'})`;
     if (session.isAdmin) {
       adminCard.classList.remove('hidden');
       loadAdminKeys();
@@ -673,6 +679,10 @@
 
   loginBtn.addEventListener('click', () => {
     window.location.href = '/auth/discord';
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    window.location.href = '/logout';
   });
 
   generateBtn.addEventListener('click', async () => {
